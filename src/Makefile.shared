@@ -41,7 +41,7 @@ OSUFFIX        :=
 # Access paths.
 OCAMLDEP       := ocamldep
 OCAMLLEX       := ocamllex
-COUAC          := ~/usr/bin/menhir --dump 
+COUAC          := menhir --dump 
 
 # TEMPORARY ne pas hard-coder le chemin relatif de couac
 # A list of targets that do not require dependency analysis.

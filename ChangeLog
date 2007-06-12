@@ -1,5 +1,10 @@
 2007-06-12  Thomas Moulard  <thomas.moulard@lrde.epita.fr>
 
+	Fix Makefile.
+	* src/Makefile.shared: Fix menhir path.
+
+2007-06-12  Thomas Moulard  <thomas.moulard@lrde.epita.fr>
+
 	Initial import.
 	* ChangeLog: New.
 	* src/Makefile.auto: New.
