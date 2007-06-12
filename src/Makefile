@@ -16,10 +16,9 @@ OCAMLOPT := ocamlfind ocamlopt -package alphaLib
 
 all: pfiou
 
-syntax.ml syntax.mli: syntax.mla
+syntax.ml: syntax.mla
 	alphaCaml syntax.mla
-
-constraint.ml constraint.mli: constraint.mla
+constraint.ml: constraint.mla
 	alphaCaml constraint.mla
 
 include Makefile.shared
