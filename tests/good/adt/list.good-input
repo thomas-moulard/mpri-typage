@@ -1,0 +1,7 @@
+type list =
+  Nil 
+| Cons of int * list
+end
+
+val l = Cons 0 Nil
+

@@ -1,0 +1,105 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[french]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{stmaryrd}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{xspace}
+\geometry{margin=35pt}
+
+\title{PFIOU: inférence de types pour ML}
+\author{Yann Régis-Gianas}
+\date{}
+
+\begin{document}
+
+\maketitle
+\section{Objectifs du projet}
+
+Ce projet est l'application directe des deux premières séances du cours de 
+typage des langages de programmation. 
+
+On étudie un langage de programmation fortement inspiré de ML. On vous
+fournit l'analyseur syntaxique ainsi qu'un ensemble de modules
+d'infrastructure (pretty-printer, syntaxe de contraintes, outils divers...).
+
+L'objectif est d'implémenter~:
+
+\begin{itemize}
+\item Un interpréteur pour ce langage ;
+\item La génération des contraintes de bon typage ;
+\item La résolution de ces contraintes.
+\end{itemize}
+
+La composition des deux derniers points conduit à l'obtention d'un moteur
+d'inférence de types. 
+
+\section{Détails techniques}
+
+La tarball \verb!pfiou-student.tar.gz! est un code à trou commenté. Le projet
+compile mais ne fonctionne évidemment pas~: il reste à remplir les parties
+du projet contenant des \verb!FIXME!. 
+
+Vous pouvez télécharger cette tarball à cette adresse~:
+
+\begin{center}
+\url{http://gallium.inria.fr/~regisgia/teaching/epita/pfiou}
+\end{center}
+
+Pour compiler le projet, il est nécessaire d'installer~:
+\begin{itemize}
+\item O'Caml 3.09 (ou plus)~: \url{http://caml.inria.fr} ;
+\item Menhir~: \url{http://gallium.inria.fr/~fpottier/menhir} ;
+\item AlphaCaml~: \url{http://gallium.inria.fr/~fpottier/alphaCaml}.
+\end{itemize}
+
+Une batterie de tests minimale est fournie dans la tarball (il est fortement
+conseillé de l'augmenter par vos propres tests). 
+
+Vous serez évalué lors d'une soutenance qui se déroulera courant septembre. 
+
+Voici les étapes du projet à réussir
+dans l'ordre (plus vous passez d'étapes et plus votre note sera haute)~:
+\begin{enumerate}
+\item Interpréteur pour la totalité du langage ;
+\item Inférence de type pour le sous-langage correspondant au $\lambda$-calcul
+simplement typé ;
+\item Inférence de type pour le sous-langage correspondant à ML (l'ensemble
+du langage sans la récursion et les types algébriques) ;
+\item Inférence de type en ajoutant la récursion ;
+\item Inférence de type en ajoutant les types algébriques.
+\end{enumerate}
+
+Les points suivants sont ``bonus'' (ils ne seront évalués qu'à condition
+que les étapes précédentes soient réussies)~:
+\begin{itemize}
+\item Rajout de constantes au langage (par exemple les opérateurs de l'arithmétique, de comparaison, de manipulation de chaîne de caractère ou d'appel de 
+fonctions externes) ;
+\item Ecriture de ``gros programmes'' à l'aide de ces constantes ;
+\item Rajout des types equi-récursifs ;
+\item Rajout des rangées ;
+\item Tout rajout intéréssant pourra être présenté.
+\end{itemize}
+
+\section{Conseils}
+
+Avant toute chose, une lecture complète du code fourni s'impose 
+pour comprendre l'intéraction entre les modules. La documentation
+d'AlphaCaml est nécessaire pour comprendre comment manipuler la
+syntaxe d'ordre supérieur. Vous pourrez ensuite attaquer l'interpréteur
+du langage. C'est une partie très simple. L'étape suivante est
+de commencer le solveur de contraintes (vous pouvez laisser de côté
+la généralisation pour le moment). En remplissant le module de génération
+de contraintes pour la restriction du langage au $\lambda$-calcul simplement
+typé. Reste alors à écrire l'algorithme de généralisation (la partie
+la plus difficile du projet) pour pouvoir traiter l'ensemble du
+langage de programmation excepté la récursion et les types algébriques. Ces
+deux derniers points sont relativement simples dans la mesure où il
+suffit de comprendre les contraintes associées à ces deux
+nouvelles constructions.
+
+\end{document}

@@ -1,0 +1,8 @@
+type id 'a =
+   Id of 'a
+end
+
+val apply g x =
+  match x with
+     | Id y -> g y
+  end

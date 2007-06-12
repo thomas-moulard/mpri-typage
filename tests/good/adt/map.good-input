@@ -1,0 +1,14 @@
+type list = 
+  Nil
+| Cons of int * list
+end
+
+val rec map f l =
+  match l with
+    | Nil -> Nil
+    | Cons x xs -> Cons (f x) (map f xs) 
+  end
+
+val l = Cons 1 (Cons 2 Nil)
+
+val zl = map (fun x. 0) l

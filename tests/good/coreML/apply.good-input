@@ -1,0 +1,1 @@
+val apply f x = f x

@@ -1,0 +1,1 @@
+val rec inf x = inf (fun f. f x)

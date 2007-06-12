@@ -1,0 +1,3 @@
+app_int_fun = fun (f : int -> int).fun (x : int).f x
+
+app_int_fun : ((int -> int) -> (int -> int))

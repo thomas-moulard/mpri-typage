@@ -1,0 +1,29 @@
+Nil = Nil
+
+Cons = Cons
+
++ = fun (x : int).fun (y : int).0
+
+len = fun l.match l with 
+    | Nil -> 0
+    | Cons x xs -> 1 (fun (x1 : int).(fun (y : int).0)) (let rec len1 l1 =
+      match l1 with 
+          | Nil -> 0
+          | Cons x1 xs1 -> ((1 (fun (x2 : int).(fun (y : int).0))) (len1 xs1))
+      end
+
+    in
+len1 xs)
+end
+
+
+l = 0
+
+l' = 0
+
+l' : int
+l : int
+len : (list -> int)
++ : (int -> (int -> int))
+Cons : (int -> (list -> list))
+Nil : list

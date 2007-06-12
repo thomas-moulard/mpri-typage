@@ -1,0 +1,20 @@
+Nil = Nil
+
+Cons = Cons
+
+map = fun f.fun l.match l with 
+    | Nil -> Nil
+    | Cons x xs -> Cons (f x) ((let rec map1 f1 l1 =
+      match l1 with 
+          | Nil -> Nil
+          | Cons x1 xs1 -> ((Cons (f1 x1)) ((map1 f1) xs1))
+      end
+
+    in
+map1 f) xs)
+end
+
+
+map : forall 'a 'b.(('b -> 'a) -> (list 'b -> list 'a))
+Cons : forall 'a.('a -> (list 'a -> list 'a))
+Nil : forall 'a.list 'a

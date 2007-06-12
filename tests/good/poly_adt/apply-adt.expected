@@ -1,0 +1,9 @@
+Id = Id
+
+apply = fun g.fun x.match x with 
+    | Id y -> g y
+end
+
+
+apply : forall 'a 'b.(('b -> 'a) -> (id 'b -> 'a))
+Id : forall 'a.('a -> id 'a)

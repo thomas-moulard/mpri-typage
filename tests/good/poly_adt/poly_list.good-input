@@ -1,0 +1,8 @@
+type list 'a = 
+   Nil 
+|  Cons of 'a * list 'a
+end
+
+val nil = Nil
+
+val l = Cons 0 nil

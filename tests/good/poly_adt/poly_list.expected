@@ -1,0 +1,12 @@
+Nil = Nil
+
+Cons = Cons
+
+nil = Nil
+
+l = Cons 0 Nil
+
+l : list int
+nil : forall 'a.list 'a
+Cons : forall 'a.('a -> (list 'a -> list 'a))
+Nil : forall 'a.list 'a

@@ -1,0 +1,34 @@
+sort id
+
+sort var
+
+type ty_constraint =
+  | CEq of ty * ty
+  | CInst of atom id * ty
+  | CLet of 
+      <(clet_ty_abs binds id)
+	atom id * outer clet_scheme * inner ty_constraint >
+  | CAnd of ty_constraint * ty_constraint
+  | CExists of <(exists_abs binds var) ex_var list * inner ty_constraint>
+  | CNewConstant of <(newconstant_abs binds var) atom var * inner ty_constraint>
+  | CTrue
+  | CFalse
+  | CDump
+
+type clet_scheme =
+  <(clet_scheme_abs binds var) ex_var list * 
+    inner ty_constraint * inner ty >
+
+type ex_var binds var = atom var
+
+type ty_var = atom var
+
+type ty = 
+  | CTyVar of atom var
+  | CTyArrow of ty * ty
+  | CTyApp of atom var * ty list
+  | CTyConstant of ty_constant
+
+type ty_constant = 
+  | CTyInt
+  | CTyString

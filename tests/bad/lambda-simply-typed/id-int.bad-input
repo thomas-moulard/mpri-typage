@@ -1,0 +1,2 @@
+val id (x : int) = x 
+val z = id (fun x. x)

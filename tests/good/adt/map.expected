@@ -1,0 +1,26 @@
+Nil = Nil
+
+Cons = Cons
+
+map = fun f.fun l.match l with 
+    | Nil -> Nil
+    | Cons x xs -> Cons (f x) ((let rec map1 f1 l1 =
+      match l1 with 
+          | Nil -> Nil
+          | Cons x1 xs1 -> ((Cons (f1 x1)) ((map1 f1) xs1))
+      end
+
+    in
+map1 f) xs)
+end
+
+
+l = Cons 1 ((Cons 2) Nil)
+
+zl = Cons 0 ((Cons 0) Nil)
+
+zl : list
+l : list
+map : ((int -> int) -> (list -> list))
+Cons : (int -> (list -> list))
+Nil : list

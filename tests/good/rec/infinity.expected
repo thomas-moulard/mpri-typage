@@ -1,0 +1,6 @@
+inf = fun x.let rec inf1 x1 =
+  inf1 x1
+in
+inf1 x
+
+inf : forall 'a 'b.('b -> 'a)

@@ -1,0 +1,2 @@
+val choice (f: (int -> int) -> (int -> int) -> int -> int) (x : int) =
+  f (fun (x: int). x) x x 

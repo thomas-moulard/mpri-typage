@@ -1,0 +1,9 @@
+Nil = Nil
+
+Cons = Cons
+
+l = Cons 0 Nil
+
+l : list
+Cons : (int -> (list -> list))
+Nil : list

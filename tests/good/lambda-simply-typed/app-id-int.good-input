@@ -1,0 +1,4 @@
+val id (x : int) = 
+  x
+
+val z = 0

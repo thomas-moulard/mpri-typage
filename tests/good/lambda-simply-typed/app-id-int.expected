@@ -1,0 +1,6 @@
+id = fun (x : int).x
+
+z = 0
+
+z : int
+id : (int -> int)

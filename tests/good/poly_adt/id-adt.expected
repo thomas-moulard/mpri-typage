@@ -1,0 +1,9 @@
+Id = Id
+
+f = fun x.match x with 
+    | Id y -> y
+end
+
+
+f : forall 'a.(id 'a -> 'a)
+Id : forall 'a.('a -> id 'a)

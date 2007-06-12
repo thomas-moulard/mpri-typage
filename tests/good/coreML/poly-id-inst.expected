@@ -1,0 +1,9 @@
+id = fun x.x
+
+z = 0
+
+z' = "foo"
+
+z' : string
+z : int
+id : forall 'a.('a -> 'a)

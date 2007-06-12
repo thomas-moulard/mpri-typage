@@ -1,0 +1,15 @@
+type list = 
+  Nil
+| Cons of int * list
+end
+
+val ( + ) (x : int) (y : int) = 0
+
+val rec len l = 
+  match l with
+    | Nil -> 0 
+    | Cons x xs -> 1 + len xs
+  end  
+
+val l = len Nil
+val l' = len (Cons 0 Nil)

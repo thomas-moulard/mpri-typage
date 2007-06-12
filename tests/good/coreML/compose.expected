@@ -1,0 +1,3 @@
+compose = fun f.fun g.fun x.f (g x)
+
+compose : forall 'a 'b 'c.(('c -> 'b) -> (('a -> 'c) -> ('a -> 'b)))

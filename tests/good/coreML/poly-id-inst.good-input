@@ -1,0 +1,3 @@
+val id x = x
+val z = id 0
+val z' = id "foo"

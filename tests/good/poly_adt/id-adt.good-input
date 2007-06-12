@@ -1,0 +1,8 @@
+type id 'a =
+  Id of 'a
+end
+
+val f x =
+  match x with
+    | Id y -> y
+  end

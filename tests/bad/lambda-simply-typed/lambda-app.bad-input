@@ -1,0 +1,2 @@
+val app_int_fun (f : int -> int) (x : int) = 
+  x f

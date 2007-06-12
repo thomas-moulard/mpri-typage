@@ -1,0 +1,2 @@
+val apply f x = f x
+val z = apply 0 (fun x. x)

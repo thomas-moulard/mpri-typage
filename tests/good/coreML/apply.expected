@@ -1,0 +1,3 @@
+apply = fun f.fun x.f x
+
+apply : forall 'a 'b.(('b -> 'a) -> ('b -> 'a))

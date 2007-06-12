@@ -1,0 +1,10 @@
+type list 'a =
+  Nil
+| Cons of 'a * list 'a
+end
+
+val rec map f l =
+  match l with
+   | Nil -> Nil
+   | Cons x xs -> Cons (f x) (map f xs)
+  end

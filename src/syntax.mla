@@ -1,0 +1,66 @@
+sort var
+
+type annotation = [ Positions.t ]
+
+type program = 
+  | EmptyProgram 
+  | NewDefinition of annotation * 
+      <(toplevel_abs binds var) toplevel_definition * inner program >
+
+type toplevel_definition binds var =
+  | TypeDefinition of atom var * param list * type_definition
+  | ValDefinition of atom var * outer term
+  | RecDefinitions of atom var * inner term
+
+type param binds var = atom var
+
+type term = 
+  | EVar of annotation * atom var
+  | EApp of annotation * [ Level.t ] * term * term
+  | ELambda of annotation * <(lambda_abs binds var) 
+      binder * inner term>
+  | ELet of annotation * <(let_abs binds var) 
+      atom var * 
+      outer term * 
+      inner term>
+  | ELetRec of annotation * <(rec_abs binds var) 
+      atom var * inner term * inner term>
+  | EConstant of annotation * primitive
+  | EMatch of annotation * term * clause list
+  | EAnnot of annotation * term * ty
+
+type binder binds var = 
+  | AnnotatedBind of atom var * outer ty
+  | Bind of atom var
+
+type clause =
+  <(clause_abs binds var) neutral annotation * pattern * inner term>
+  
+type pattern binds var =
+  | PVar of neutral annotation * atom var
+  | PDataCon of neutral annotation * outer constructor * pattern list
+
+type constructor =
+    atom var
+
+type primitive =
+  | Int of [ int ]
+  | String of [ string ]
+  
+type ty = 
+  | TyArrow of annotation * ty * ty
+  | TyApp of annotation * atom var * ty list
+  | TyVar of annotation * atom var 
+  | TyConstant of annotation * ty_constant
+
+type ty_constant = 
+  | TyInt
+  | TyString
+
+type type_definition binds var =
+  | AlgebraicDataType of datatype_def list
+
+type datatype_def binds var = 
+  | DataType of atom var * inner ty list
+
+
