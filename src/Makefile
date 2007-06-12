@@ -14,12 +14,23 @@ EXECUTABLE          := pfiou
 OCAMLC := ocamlfind ocamlc -g -package alphaLib
 OCAMLOPT := ocamlfind ocamlopt -package alphaLib
 
-all: pfiou
+all: fake
+
+fake: pfiou
 
 syntax.ml: syntax.mla
 	alphaCaml syntax.mla
+	$(OCAMLOPT) -c syntax.mli
+	
 constraint.ml: constraint.mla
 	alphaCaml constraint.mla
+	$(OCAMLOPT) -c constraint.mli
+
+parser.mli.d: parser.mly
+	ocamlfind ocamldep parser.mli
+
+constraintParser.mli.d: constraintParser.mly
+	ocamlfind ocamldep constraintParser.mli
 
 include Makefile.shared
 include Makefile.auto
