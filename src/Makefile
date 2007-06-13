@@ -18,19 +18,35 @@ all: fake
 
 fake: pfiou
 
-syntax.ml: syntax.mla
+syntax.ml syntax.mli: syntax.mla
 	alphaCaml syntax.mla
 	$(OCAMLOPT) -c syntax.mli
+	ocamldep syntax.mli > syntax.mli.d
+
+syntax.ml.d: syntax.ml	
+	ocamldep syntax.ml > syntax.ml.d
+
+syntax.mli.d: syntax.mli
+	ocamldep syntax.mli > syntax.mli.d
 	
-constraint.ml: constraint.mla
+constraint.ml constraint.mli: constraint.mla
 	alphaCaml constraint.mla
 	$(OCAMLOPT) -c constraint.mli
+	ocamldep constraint.mli > constraint.mli.d
+
+constraint.ml.d: constraint.ml	
+	ocamldep constraint.ml > constraint.ml.d
+
+constraint.mli.d: constraint.mli
+	ocamldep constraint.mli > constraint.mli.d
 
 parser.mli.d: parser.mly
-	ocamlfind ocamldep parser.mli
+	ocamldep parser.ml > parser.ml.d
+	ocamldep parser.mli > parser.mli.d
 
 constraintParser.mli.d: constraintParser.mly
-	ocamlfind ocamldep constraintParser.mli
+	ocamldep constraintParser.ml > constraintParser.ml.d
+	ocamldep constraintParser.mli > constraintParser.mli.d
 
 include Makefile.shared
 include Makefile.auto
