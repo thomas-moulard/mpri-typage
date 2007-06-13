@@ -1980,7 +1980,7 @@ and _menhir_error11 : _menhir_env -> 'ttv_tail * _menhir_state * (string) * Lexi
 
 and _menhir_fail : unit -> 'a =
   fun () ->
-    Printf.fprintf stderr "Internal failure -- please contact the parser generator's developers.\n%!";
+    Printf.fprintf Pervasives.stderr "Internal failure -- please contact the parser generator's developers.\n%!";
     assert false
 
 and _menhir_error1 : _menhir_env -> 'ttv_tail * _menhir_state * Lexing.position -> 'ttv_return =

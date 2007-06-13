@@ -233,7 +233,7 @@ and _menhir_goto_nonempty_list_ID_ : _menhir_env -> 'ttv_tail -> _menhir_state -
 
 and _menhir_fail : unit -> 'a =
   fun () ->
-    Printf.fprintf stderr "Internal failure -- please contact the parser generator's developers.\n%!";
+    Printf.fprintf Pervasives.stderr "Internal failure -- please contact the parser generator's developers.\n%!";
     assert false
 
 and _menhir_error34 : _menhir_env -> (((('ttv_tail * _menhir_state) * (string)) * _menhir_state) * _menhir_state * (Constraint.Raw.ex_var list)) * _menhir_state * (Constraint.Raw.ty_constraint) -> 'ttv_return =

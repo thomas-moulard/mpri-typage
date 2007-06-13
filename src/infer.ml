@@ -68,8 +68,8 @@ and clause env tv ty clause_abs =
 and pattern env tv = 
 (* FIXME *) assert false
       
-and ty_of_constant = 
-(* FIXME *) assert false
+and ty_of_constant = function
+  | _ -> (* FIXME *) assert false
 
 and ty_to_cty env = 
 (* FIXME *) assert false

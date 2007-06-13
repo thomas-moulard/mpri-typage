@@ -47,11 +47,11 @@ let subst_program phi p =
   with Not_found ->
     failwith "Error during application of a substitution to a program"
 
-let is_value = 
-(* FIXME *) assert false
+let is_value = function
+  | _ -> (* FIXME *) assert false
 
-let rec destruct_dataconstructor_app = 
-(* FIXME *) assert false
+let rec destruct_dataconstructor_app =  function
+  | _ -> (* FIXME *) assert false
 
 let dataconstructor_counter = ref 0
 
@@ -62,8 +62,18 @@ let dataconstructor_value () =
 let fix x t1 = 
 (* FIXME *) assert false
 
-let rec eval = 
-(* FIXME *) assert false
+let rec eval = function
+  (*
+  | EVar (annotation, var) -> 
+  | EApp (annotation, level, term1, term2) -> 
+  | ELambda (annotation, lambda_abs) -> 
+  | ELet (annotation, let_abs) -> 
+  | ELetRec (annotation, rec_abs) -> 
+  | EConstant (annotation, primitive) -> 
+  | EMatch (annotation, term * clause list) -> 
+  | EAnnot (annotation, term * ty) -> 
+  *)
+  | x -> x
 
 and eval_match v = 
 (* FIXME *) assert false
@@ -71,10 +81,13 @@ and eval_match v =
 and match_pattern p v = 
 (* FIXME *) assert false
 
-let rec eval_toplevel_definition = 
-(* FIXME *) assert false
+let rec eval_toplevel_definition = function
+  | TypeDefinition (var, param_list, typedef) -> (* FIXME *) assert false
+  | ValDefinition (var, term) -> (var, eval term)(*(* FIXME *) assert false*)
+  | RecDefinitions (var, term) -> (* FIXME *) assert false
 
-and eval_program = 
-(* FIXME *) assert false
-
-      
+and eval_program = function
+  | EmptyProgram -> []
+  | NewDefinition (_, otlabs) -> 
+      let (tldef, program) = open_toplevel_abs otlabs in
+      (eval_toplevel_definition tldef) :: (eval_program program)

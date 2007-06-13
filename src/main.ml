@@ -61,6 +61,7 @@ let () =
 	     Syntax.Var.AtomIdMap.empty result)
     with _ -> Printf.printf "Evaluation failed\n"
       
+(*
 (** Génère la contrainte de typage du programme. *)
 let ty_constraint = 
   Infer.dump_ty_constraint_of program
@@ -90,4 +91,4 @@ let () =
     | Unifier.Cycle ->
 	Printf.printf "There is a cycle in the type of this program.\n";
 	exit 1
-
+*)
