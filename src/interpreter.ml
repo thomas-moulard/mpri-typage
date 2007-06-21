@@ -16,8 +16,8 @@ object (self)
 
   method evar (pos, x) =
     try
-      Var.AtomMap.lookup x self#phi 
-    with Not_found -> 
+      Var.AtomMap.lookup x self#phi
+    with Not_found ->
       (*print_string "Not found < ";
       print_string (Syntax.Var.Atom.basename x);
       print_endline " >";*)
@@ -25,25 +25,25 @@ object (self)
 
 end
 
-let subst_id = 
+let subst_id =
   Var.AtomMap.empty
 
-let ( |-> ) x t = 
+let ( |-> ) x t =
   Var.AtomMap.add x t subst_id
 
-let union f g = 
+let union f g =
   Var.AtomMap.union f g
 
 let subst_gen = new subst_gen
 
-let subst_term phi term = 
+let subst_term phi term =
   try
     subst_gen#set_phi phi;
     subst_gen#term term
   with Not_found ->
     failwith "Error during application of a substitution to a term"
 
-let subst_program phi p = 
+let subst_program phi p =
   try
     subst_gen#set_phi phi;
     subst_gen#program p
@@ -62,10 +62,10 @@ let dataconstructor_value () =
   incr dataconstructor_counter;
   EConstant (Positions.dummy, Int (!dataconstructor_counter))
 
-let fix x t1 = 
+let fix x t1 =
 (* FIXME *) assert false
 
-let term2string = function 
+let term2string = function
   | EVar (_, var) -> Syntax.Var.Atom.basename var
   | ELambda (_, lambda_abs) -> let (binder, _) = open_lambda_abs lambda_abs in
                                Syntax.Var.Atom.basename (var_of_binder binder)
@@ -79,7 +79,7 @@ let term2string = function
 
 
 
-let dump_map map = 
+let dump_map map =
   let buffer = Buffer.create 100000 in
   let pk buf key = Buffer.add_string buf (Var.Atom.basename key) in
   let pa buf data = Buffer.add_string buf (term2string data) in
@@ -89,7 +89,7 @@ let dump_map map =
   print_endline "+----------------------+";
   print_endline s;
   print_endline "+----------------------+"
-  
+
 let rec eval = function
   | EVar (annotation, var) -> (*print_string "Eval -> EVar [ ";
                               print_string (Syntax.Var.Atom.basename (var));
@@ -100,7 +100,7 @@ let rec eval = function
                                               x
 
   | EApp (annotation, level, term1, term2) as x -> (*let () = print_endline "Eval -> EApp" in *)
-                                                   let et2 = eval term2 in 
+                                                   let et2 = eval term2 in
                                                    let et1 = eval term1 in (* utile ou pas ? *)
                                                    et2
 
@@ -122,33 +122,62 @@ let rec eval = function
   (* ... *)
   | ELetRec (annotation, rec_abs) as x -> print_endline "Eval -> ELetRec"; x
   | EMatch (annotation, term, clause_list) as x -> print_endline "Eval -> EMatch"; x
-  | EAnnot (annotation, term, ty) as x -> print_endline "Eval -> EAnnot"; x 
+  | EAnnot (annotation, term, ty) as x -> print_endline "Eval -> EAnnot"; x
 
-and eval_match v = 
+and eval_match v =
 (* FIXME *) assert false
 
-and match_pattern p v = 
+and match_pattern p v =
 (* FIXME *) assert false
 
-let rec print_param_list l = match l with
-  | [] -> ()
-  | e::l -> print_string (Syntax.Var.Atom.basename e); print_param_list l
+
+let rec print_list f l = match l with
+  | [] -> ""
+  | e::l -> f e ^ "\n" ^ print_list f l
+
+let rec print_param_list l = print_endline (print_list Syntax.Var.Atom.basename l)
+
+let rec print_ty ty = match ty with
+  | TyArrow(annotation, ty1, ty2) -> print_ty ty1 ^ " -> " ^ print_ty ty2
+  | TyApp(annotation, var, tyl) -> (Syntax.Var.Atom.basename var) ^ "." ^ (print_list print_ty tyl)
+  | TyVar(annotation, var) -> "var " ^ (Syntax.Var.Atom.basename var)
+  | TyConstant(annotation, ty_constant) ->
+      match ty_constant with
+        | TyString -> "string"
+        | TyInt -> "int"
+
+let print_datatype x = match x with
+  | DataType(v, tyl) -> "DataType" ^ "\n" ^ (Syntax.Var.Atom.basename v) ^ print_list print_ty tyl
+  | _ -> "xxx"
+
+let print_typedef td = match td with
+  | AlgebraicDataType(x) -> print_endline "AlgebraicDataType"; print_endline (print_list print_datatype x)
+  | _ -> print_string "xxx"
 
 let rec eval_toplevel_definition = function
-  | TypeDefinition (var, param_list, typedef) -> assert false;
+  | TypeDefinition (var, param_list, typedef) as x -> (*print_string (Syntax.Var.Atom.basename var);
+                                                        print_param_list param_list;
+                                                        print_newline ();
+                                                        print_typedef typedef;*)
+                                                      x
   | ValDefinition (var, term) -> (*print_string "Eval_toplevel_definition -> ValDefinition [ ";
                                  print_string (Syntax.Var.Atom.basename var);
                                  print_string " ]";
                                  print_newline ();*)
-                                 (var, eval term)
-  | RecDefinitions (var, term) -> (* FIXME *) assert false
+                                 ValDefinition(var, eval term)
+  | RecDefinitions (var, term) -> RecDefinitions(var, eval term)
 
 and eval_program = function
   | EmptyProgram -> (*print_endline "Eval_program -> EmptyProgram";*) []
-  | NewDefinition (i, otlabs) as prog -> 
+  | NewDefinition (i, otlabs) as prog ->
       (*let () = print_endline "Eval_program -> NewDefinition" in *)
       let (tldef, program) = open_toplevel_abs otlabs in
-      let (var, term) as eval_res = (eval_toplevel_definition tldef) in
-      let x = subst_id in 
-      let () = ignore (subst_program x prog) in
-      eval_res :: (eval_program program)
+      match (eval_toplevel_definition tldef) with
+        | TypeDefinition (var, param_list, typedef) -> eval_program program
+        | ValDefinition (var, term) ->
+            let () = ignore (subst_program subst_id prog) in
+              (var, term) :: (eval_program program)
+        | RecDefinitions (var, term) ->
+            let () = ignore (subst_program subst_id prog) in
+              (var, term) :: (eval_program program)
+

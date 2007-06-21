@@ -28,7 +28,7 @@ syntax.ml.d: syntax.ml
 
 syntax.mli.d: syntax.mli
 	ocamldep syntax.mli > syntax.mli.d
-	
+
 constraint.ml constraint.mli: constraint.mla
 	alphaCaml constraint.mla
 	$(OCAMLOPT) -c constraint.mli

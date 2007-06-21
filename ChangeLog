@@ -1,3 +1,10 @@
+2007-06-21  Thomas Moulard  <thomas.moulard@gmail.com>
+
+	Add type evaluation.
+	* src/constraintParser.ml: Remove.
+	* src/interpreter.ml: Here.
+	* src/parser.ml: Remove.
+
 2007-06-12  Thomas Moulard  <thomas.moulard@lrde.epita.fr>
 
 	Fix Makefile.
