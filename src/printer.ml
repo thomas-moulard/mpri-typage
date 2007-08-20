@@ -33,7 +33,8 @@ let rec program env = function
 
 and toplevel_definition env = function
   | TypeDefinition (x, xs, type_def) ->
-      newline (print_def env "type" x string xs type_definition type_def)
+      ignore (newline (print_def env "type" x string xs type_definition type_def));
+      string env "\nend\n"
 
   | ValDefinition (x, t) ->
       let xs, t = extract_fun t in
@@ -89,7 +90,7 @@ and term env = function
       let env = string env " with " in
       let env = new_block env in
       let env = List.fold_left clause env cs in
-	string (end_block env) "end\n"
+	string (end_block env) "\nend\n"
 
   | EAnnot (_, t, annot) ->
       let env = string env "(" in

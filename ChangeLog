@@ -1,3 +1,56 @@
+2007-08-20  Thomas Moulard  <thomas.moulard@gmail.com>
+
+	Clean code.
+	* src/interpreter.ml: Here.
+	* src/printer.ml: Add end after pretty-printing a type.
+	* tests/bad-ok-counter: Remove.
+	* tests/bad/adt/bad-ok-counter: Remove.
+	* tests/bad/adt/len.bad-output: Remove.
+	* tests/bad/adt/list.bad-output: Remove.
+	* tests/bad/adt/map.bad-output: Remove.
+	* tests/bad/coreML/apply.bad-output: Remove.
+	* tests/bad/coreML/bad-ok-counter: Remove.
+	* tests/bad/coreML/compose.bad-output: Remove.
+	* tests/bad/coreML/poly-id-inst.bad-output: Remove.
+	* tests/bad/coreML/poly-id.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/app-id-int.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/bad-ok-counter: Remove.
+	* tests/bad/lambda-simply-typed/choice-int.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/constant-int.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/id-int.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/lambda-app.bad-output: Remove.
+	* tests/bad/lambda-simply-typed/several-int.bad-output: Remove.
+	* tests/bad/poly_adt/apply-adt.bad-output: Remove.
+	* tests/bad/poly_adt/bad-ok-counter: Remove.
+	* tests/bad/poly_adt/id-adt.bad-output: Remove.
+	* tests/bad/poly_adt/map.bad-output: Remove.
+	* tests/bad/poly_adt/poly_list.bad-output: Remove.
+	* tests/bad/rec/bad-ok-counter: Remove.
+	* tests/bad/rec/infinity.bad-output: Remove.
+	* tests/good/adt/bad-ok-counter: Remove.
+	* tests/good/adt/len.good-output: Remove.
+	* tests/good/adt/list.good-output: Remove.
+	* tests/good/adt/map.good-output: Remove.
+	* tests/good/coreML/apply.good-output: Remove.
+	* tests/good/coreML/bad-ok-counter: Remove.
+	* tests/good/coreML/compose.good-output: Remove.
+	* tests/good/coreML/poly-id-inst.good-output: Remove.
+	* tests/good/coreML/poly-id.good-output: Remove.
+	* tests/good/lambda-simply-typed/app-id-int.good-output: Remove.
+	* tests/good/lambda-simply-typed/bad-ok-counter: Remove.
+	* tests/good/lambda-simply-typed/choice-int.good-output: Remove.
+	* tests/good/lambda-simply-typed/constant-int.good-output: Remove.
+	* tests/good/lambda-simply-typed/id-int.good-output: Remove.
+	* tests/good/lambda-simply-typed/lambda-app.good-output: Remove.
+	* tests/good/lambda-simply-typed/several-int.good-output: Remove.
+	* tests/good/poly_adt/apply-adt.good-output: Remove.
+	* tests/good/poly_adt/bad-ok-counter: Remove.
+	* tests/good/poly_adt/id-adt.good-output: Remove.
+	* tests/good/poly_adt/map.good-output: Remove.
+	* tests/good/poly_adt/poly_list.good-output: Remove.
+	* tests/good/rec/bad-ok-counter: Remove.
+	* tests/good/rec/infinity.good-output: Remove.
+
 2007-06-21  Thomas Moulard  <thomas.moulard@gmail.com>
 
 	Add type evaluation.
