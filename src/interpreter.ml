@@ -85,6 +85,7 @@ let union f g =
 
 let subst_gen = new subst_gen
 
+
 let subst_term phi term =
   try
     subst_gen#set_phi phi;
@@ -124,9 +125,16 @@ let rec eval = function
                                               x
 
   | EApp (annotation, level, term1, term2) -> (*let () = print_endline "Eval -> EApp" in *)
-      let et2 = eval term2 in
-      let _ = eval term1 in (* utile ou pas ? *)
-        et2
+      let tfun = eval term1 in
+      (
+        match tfun with
+          | ELambda(annotation, lambda_abs) ->
+              let (bind, term) = open_lambda_abs lambda_abs in
+              let new_bind = (var_of_binder bind) |-> (eval term2) in 
+              let substterm = subst_term new_bind term in 
+                eval substterm
+          | _ -> EApp(annotation, level, tfun, eval term2)
+      )
 
   | ELambda (annotation, lambda_abs) as x -> (*let () = print_string "Eval -> ELambda [ " in
                                              let (binder, term) = (open_lambda_abs lambda_abs) in
@@ -155,29 +163,29 @@ and match_pattern p v =
 (* FIXME *) assert false
 
 let rec eval_toplevel_definition = function
-  | TypeDefinition (var, param_list, typedef) as x -> (*print_string (Syntax.Var.Atom.basename var);
+  | TypeDefinition (var, param_list, typedef) -> (*print_string (Syntax.Var.Atom.basename var);
                                                         print_param_list param_list;
                                                         print_newline ();
                                                         print_typedef typedef;*)
-                                                      x
+                                                      (* eval_typedef *)
+                                                      assert false
   | ValDefinition (var, term) -> (*print_string "Eval_toplevel_definition -> ValDefinition [ ";
                                  print_string (Syntax.Var.Atom.basename var);
                                  print_string " ]";
-                                 print_newline ();*)
-                                 ValDefinition(var, eval term)
-  | RecDefinitions (var, term) -> RecDefinitions(var, eval term)
+                                 print_newline ();
+                                 *)
+                                 let evalterm = eval term in
+                                 let x = var |-> evalterm in 
+                                 let y = union subst_gen#phi x in
+                                 let () = subst_gen#set_phi y in
+                                 (var, evalterm)
+  | RecDefinitions (var, term) -> (var, eval term)
 
 and eval_program = function
-  | EmptyProgram -> (*print_endline "Eval_program -> EmptyProgram";*) []
-  | NewDefinition (i, otlabs) as prog ->
-      (*let () = print_endline "Eval_program -> NewDefinition" in *)
+  | EmptyProgram -> []
+  | NewDefinition (i, otlabs) ->
+      let () = subst_gen#set_phi subst_id in
       let (tldef, program) = open_toplevel_abs otlabs in
-      match (eval_toplevel_definition tldef) with
-        | TypeDefinition (var, param_list, typedef) -> eval_program program
-        | ValDefinition (var, term) ->
-            let () = ignore (subst_program subst_id prog) in
-              (var, term) :: (eval_program program)
-        | RecDefinitions (var, term) ->
-            let () = ignore (subst_program subst_id prog) in
-              (var, term) :: (eval_program program)
+      let evaltoplevel = eval_toplevel_definition tldef in 
+       evaltoplevel :: (eval_program program)
 
