@@ -124,7 +124,8 @@ let rec eval = function
   | EConstant (annotation, primitive) as x -> (*let () = print_endline "Eval -> EConstant" in*)
                                               x
 
-  | EApp (annotation, level, term1, term2) -> (*let () = print_endline "Eval -> EApp" in *)
+  | EApp (annotation, level, term1, term2) -> 
+  (*let () = print_endline "Eval -> EApp" in *)
       let tfun = eval term1 in
       (
         match tfun with
@@ -181,11 +182,13 @@ let rec eval_toplevel_definition = function
                                  (var, evalterm)
   | RecDefinitions (var, term) -> (var, eval term)
 
-and eval_program = function
+and eval_program x =
+  let () = subst_gen#set_phi subst_id in
+  let rec eval_program_rec = function
   | EmptyProgram -> []
   | NewDefinition (i, otlabs) ->
-      let () = subst_gen#set_phi subst_id in
       let (tldef, program) = open_toplevel_abs otlabs in
       let evaltoplevel = eval_toplevel_definition tldef in 
-       evaltoplevel :: (eval_program program)
+       evaltoplevel :: (eval_program_rec program)
+  in eval_program_rec x
 
