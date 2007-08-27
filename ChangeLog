@@ -1,5 +1,10 @@
 2007-08-27  Thomas Moulard  <thomas.moulard@gmail.com>
 
+	Matching, let rec.
+	* src/interpreter.ml: Here.
+
+2007-08-27  Thomas Moulard  <thomas.moulard@gmail.com>
+
 	Add partial matching, type definition, fix pretty-print.
 	* interpreter.ml: Add partial matching, type definition.
 	* printer.ml: Fix pretty-print (revert previous changes).

@@ -51,7 +51,7 @@ let dump_map map =
   print_endline "+----------------------+"
 (* -- end here -- *)
 
-
+exception Matching_Failed
 
 class subst_gen =
 object (self)
@@ -104,7 +104,11 @@ let is_value = function
   | _ -> (* FIXME *) assert false
 
 let rec destruct_dataconstructor_app =  function
-  | _ -> (* FIXME *) assert false
+  | EApp (_, _, t, t') ->
+      let (constructor, args) = destruct_dataconstructor_app t in
+        (constructor, args @ [t'])
+  | EVar (_, v) -> (v, [])
+  | _ -> assert false
 
 let dataconstructor_counter = ref 0
 
@@ -112,8 +116,8 @@ let dataconstructor_value () =
   incr dataconstructor_counter;
   EConstant (Positions.dummy, Int (!dataconstructor_counter))
 
-let fix x t1 =
-(* FIXME *) assert false
+let rec fix x t1 =
+  x (fix x) t1
 
 let rec eval = function
   | EVar (annotation, var) ->
@@ -156,21 +160,35 @@ let rec eval = function
         eval term2
 
   (* ... *)
-  | ELetRec (annotation, rec_abs) as x -> print_endline "Eval -> ELetRec"; x
+  | ELetRec (annotation, rec_abs) ->
+      print_endline "Eval -> ELetRec";
+      let (v, t, t') = open_rec_abs rec_abs in
+      let _ = ELambda (annotation, Syntax.create_lambda_abs (Bind(v), t)) in
+        ELet (annotation, create_let_abs(v, t, t'))
+  (*ELet (annotation, create_let_abs(v, fix lambda t, t'))*)
+
   | EMatch (annotation, term, clause_list) ->
       print_endline "Eval -> EMatch";
       eval_match (eval term) clause_list
   | EAnnot (annotation, term, ty) as x -> print_endline "Eval -> EAnnot"; x
 
 and eval_match v = function
-  | [] -> assert false
-  | clause::l -> let (a, p ,t) = open_clause_abs clause in
-      eval t (* fixme: evalue le terme de la premiere clause passee *)
+  | [] -> failwith "Pattern matching has failed."
+  | clause::l -> let (_, p ,t) = open_clause_abs clause in
+      try
+          eval (subst_term (match_pattern p v) t)
+      with
+          Matching_Failed -> eval_match v l
 
 and match_pattern p v =
   match p with
-    | PVar(a, var) -> union subst_gen#phi (var |-> v)
-    | PDataCon(a, c, p) -> assert false
+    | PVar(_, var) -> union subst_gen#phi (var |-> v)
+    | PDataCon(_, c, p) ->
+        let (constructor, args) = destruct_dataconstructor_app v in
+          if constructor = c then
+            List.fold_left union subst_id (List.map2 match_pattern p args)
+          else
+            raise Matching_Failed
 
 let rec eval_datatype_def = function
   | [] -> []
@@ -208,5 +226,5 @@ and eval_program x =
     | NewDefinition (i, otlabs) ->
         let (tldef, program) = open_toplevel_abs otlabs in
         let evaltoplevel = eval_toplevel_definition tldef in
-          List.append evaltoplevel  (eval_program program)
+          evaltoplevel @ eval_program program
   in eval_program_rec x
