@@ -116,34 +116,37 @@ let fix x t1 =
 (* FIXME *) assert false
 
 let rec eval = function
-  | EVar (annotation, var) -> (*print_string "Eval -> EVar [ ";
-                              print_string (Syntax.Var.Atom.basename (var));
-                              print_endline " ]";*)
-                              subst_gen#evar (annotation, var) (* A priori ca va chercher la variable comme il faut *)
+  | EVar (annotation, var) ->
+      (*print_string "Eval -> EVar [ ";
+        print_string (Syntax.Var.Atom.basename (var));
+        print_endline " ]";*)
+      subst_gen#evar (annotation, var) (* A priori ca va chercher la variable comme il faut *)
 
-  | EConstant (annotation, primitive) as x -> (*let () = print_endline "Eval -> EConstant" in*)
-                                              x
+  | EConstant (annotation, primitive) as x ->
+      (*let () = print_endline "Eval -> EConstant" in*)
+      x
 
-  | EApp (annotation, level, term1, term2) -> 
-  (*let () = print_endline "Eval -> EApp" in *)
+  | EApp (annotation, level, term1, term2) ->
+      (*let () = print_endline "Eval -> EApp" in *)
       let tfun = eval term1 in
       (
         match tfun with
           | ELambda(annotation, lambda_abs) ->
               let (bind, term) = open_lambda_abs lambda_abs in
-              let new_bind = (var_of_binder bind) |-> (eval term2) in 
-              let substterm = subst_term new_bind term in 
+              let new_bind = (var_of_binder bind) |-> (eval term2) in
+              let substterm = subst_term new_bind term in
                 eval substterm
           | _ -> EApp(annotation, level, tfun, eval term2)
       )
 
-  | ELambda (annotation, lambda_abs) as x -> (*let () = print_string "Eval -> ELambda [ " in
-                                             let (binder, term) = (open_lambda_abs lambda_abs) in
-                                             let var = var_of_binder binder in
-                                             let () = print_string (Syntax.Var.Atom.basename var) in
-                                             let () = print_endline " ]" in
-                                             *)
-                                             x (* Ne pas évaluer une fonction ... *)
+  | ELambda (annotation, lambda_abs) as x ->
+      (*let () = print_string "Eval -> ELambda [ " in
+        let (binder, term) = (open_lambda_abs lambda_abs) in
+        let var = var_of_binder binder in
+        let () = print_string (Syntax.Var.Atom.basename var) in
+        let () = print_endline " ]" in
+      *)
+      x (* Ne pas évaluer une fonction ... *)
 
   | ELet (annotation, let_abs)  -> (*let () = print_string "Eval -> ELet [ " in*)
       let (var, term1, term2) = (open_let_abs let_abs) in
@@ -154,41 +157,56 @@ let rec eval = function
 
   (* ... *)
   | ELetRec (annotation, rec_abs) as x -> print_endline "Eval -> ELetRec"; x
-  | EMatch (annotation, term, clause_list) as x -> print_endline "Eval -> EMatch"; x
+  | EMatch (annotation, term, clause_list) ->
+      print_endline "Eval -> EMatch";
+      eval_match (eval term) clause_list
   | EAnnot (annotation, term, ty) as x -> print_endline "Eval -> EAnnot"; x
 
-and eval_match v =
-(* FIXME *) assert false
+and eval_match v = function
+  | [] -> assert false
+  | clause::l -> let (a, p ,t) = open_clause_abs clause in
+      eval t (* fixme: evalue le terme de la premiere clause passee *)
 
 and match_pattern p v =
-(* FIXME *) assert false
+  match p with
+    | PVar(a, var) -> union subst_gen#phi (var |-> v)
+    | PDataCon(a, c, p) -> assert false
+
+let rec eval_datatype_def = function
+  | [] -> []
+  | DataType(v, tl)::dt -> (v, EVar(Positions.dummy, v))::eval_datatype_def dt
 
 let rec eval_toplevel_definition = function
-  | TypeDefinition (var, param_list, typedef) -> (*print_string (Syntax.Var.Atom.basename var);
-                                                        print_param_list param_list;
-                                                        print_newline ();
-                                                        print_typedef typedef;*)
-                                                      (* eval_typedef *)
-                                                      assert false
-  | ValDefinition (var, term) -> (*print_string "Eval_toplevel_definition -> ValDefinition [ ";
-                                 print_string (Syntax.Var.Atom.basename var);
-                                 print_string " ]";
-                                 print_newline ();
-                                 *)
-                                 let evalterm = eval term in
-                                 let x = var |-> evalterm in 
-                                 let y = union subst_gen#phi x in
-                                 let () = subst_gen#set_phi y in
-                                 (var, evalterm)
-  | RecDefinitions (var, term) -> (var, eval term)
+  | ValDefinition (var, term) ->
+      (*print_string "Eval_toplevel_definition -> ValDefinition [ ";
+        print_string (Syntax.Var.Atom.basename var);
+        print_string " ]";
+        print_newline ();
+      *)
+      let evalterm = eval term in
+      let x = var |-> evalterm in
+      let y = union subst_gen#phi x in
+      let () = subst_gen#set_phi y in
+        [(var, evalterm)]
+
+  | TypeDefinition (var, param_list, type_def) ->
+      (*print_string (Syntax.Var.Atom.basename var);
+        print_param_list param_list;
+        print_newline ();
+        print_typedef typedef;*)
+      let AlgebraicDataType(dt) = type_def in
+        eval_datatype_def dt
+
+
+  | RecDefinitions (var, term) ->
+      [(var, eval term)]
 
 and eval_program x =
   let () = subst_gen#set_phi subst_id in
   let rec eval_program_rec = function
-  | EmptyProgram -> []
-  | NewDefinition (i, otlabs) ->
-      let (tldef, program) = open_toplevel_abs otlabs in
-      let evaltoplevel = eval_toplevel_definition tldef in 
-       evaltoplevel :: (eval_program_rec program)
+    | EmptyProgram -> []
+    | NewDefinition (i, otlabs) ->
+        let (tldef, program) = open_toplevel_abs otlabs in
+        let evaltoplevel = eval_toplevel_definition tldef in
+          List.append evaltoplevel  (eval_program program)
   in eval_program_rec x
-
