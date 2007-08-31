@@ -74,9 +74,9 @@ let rec fix x t1 =
 
 let rec eval = function
   | EVar (annotation, var) ->
-      (*print_string "Eval -> EVar [ ";
+      print_string "Eval -> EVar [ ";
         print_string (Syntax.Var.Atom.basename (var));
-        print_endline " ]";*)
+        print_endline " ]";
       subst_gen#evar (annotation, var) (* A priori ca va chercher la variable comme il faut *)
 
   | EConstant (annotation, primitive) as x ->
@@ -84,25 +84,36 @@ let rec eval = function
       x
 
   | EApp (annotation, level, term1, term2) ->
-      (*let () = print_endline "Eval -> EApp" in *)
+      let () = print_endline "Eval -> EApp" in 
       let tfun = eval term1 in
       (
         match tfun with
           | ELambda(annotation, lambda_abs) ->
               let (bind, term) = open_lambda_abs lambda_abs in
+              let var = var_of_binder bind in
+              print_string "EApp -> ELambda [";
+              print_string (Syntax.Var.Atom.basename var);
+              print_endline "]";
               let new_bind = (var_of_binder bind) |-> (eval term2) in
               let substterm = subst_term new_bind term in
                 eval substterm
-          | _ -> EApp(annotation, level, tfun, eval term2)
+          | EVar(a, var) as x -> 
+              print_string "EApp -> EVar [";
+              print_string (Syntax.Var.Atom.basename var);
+              print_endline "]";
+                  x
+          | _ ->
+                  print_endline "EApp -> _";
+                  EApp(annotation, level, tfun, eval term2)
       )
 
   | ELambda (annotation, lambda_abs) as x ->
-      (*let () = print_string "Eval -> ELambda [ " in
+      let () = print_string "Eval -> ELambda [ " in
         let (binder, term) = (open_lambda_abs lambda_abs) in
         let var = var_of_binder binder in
         let () = print_string (Syntax.Var.Atom.basename var) in
         let () = print_endline " ]" in
-      *)
+      
       x (* Ne pas évaluer une fonction ... *)
 
   | ELet (annotation, let_abs)  -> (*let () = print_string "Eval -> ELet [ " in*)
@@ -116,8 +127,8 @@ let rec eval = function
   | ELetRec (annotation, rec_abs) ->
       print_endline "Eval -> ELetRec";
       let (v, t, t') = open_rec_abs rec_abs in
-      let _ = ELambda (annotation, Syntax.create_lambda_abs (Bind(v), t)) in
-        ELet (annotation, create_let_abs(v, t, t'))
+      let () = ignore(subst_term (v |-> (t)) t) in
+        eval (ELet (annotation, create_let_abs(v, t, t')))
 
   | EMatch (annotation, term, clause_list) ->
       print_endline "Eval -> EMatch";
@@ -146,6 +157,7 @@ let rec eval_datatype_def = function
   | [] -> []
   | DataType(v, tl)::dt -> (v, EVar(Positions.dummy, v))::eval_datatype_def dt
 
+let () = subst_gen#set_phi subst_id
 let rec eval_toplevel_definition = function
   | ValDefinition (var, term) ->
       (*print_string "Eval_toplevel_definition -> ValDefinition [ ";
@@ -169,14 +181,13 @@ let rec eval_toplevel_definition = function
 
 
   | RecDefinitions (var, term) ->
+      print_endline "RecDef";
       [(var, eval term)]
 
-and eval_program x =
-  let () = subst_gen#set_phi subst_id in
-  let rec eval_program_rec = function
-    | EmptyProgram -> []
-    | NewDefinition (i, otlabs) ->
-        let (tldef, program) = open_toplevel_abs otlabs in
-        let evaltoplevel = eval_toplevel_definition tldef in
-          evaltoplevel @ eval_program program
-  in eval_program_rec x
+
+and eval_program = function 
+  | EmptyProgram -> []
+  | NewDefinition (i, otlabs) ->
+      let (tldef, program) = open_toplevel_abs otlabs in
+      let evaltoplevel = eval_toplevel_definition tldef in
+        evaltoplevel @ eval_program program
