@@ -150,8 +150,11 @@ let rec eval = function
   | ELetRec (annotation, rec_abs) ->
       print_endline "Eval -> ELetRec";
       let (v, t, t') = open_rec_abs rec_abs in
+      let context = subst_gen#phi in
       let () = ignore(subst_term (v |-> (t)) t) in
-        eval (ELet (annotation, create_let_abs(v, t, t')))
+      let x = eval (ELet (annotation, create_let_abs(v, t, t'))) in
+      let () = subst_gen#set_phi context in
+      x
 
   | EMatch (annotation, term, clause_list) ->
       print_endline "Eval -> EMatch";
@@ -189,9 +192,6 @@ let rec eval_toplevel_definition = function
         print_newline ();
       *)
       let evalterm = eval term in
-      (*print_string "binding [ ";
-      print_string (Syntax.Var.Atom.basename var);
-      print_endline " ]";*)
       let x = var |-> evalterm in
       let y = union subst_gen#phi x in
       let () = subst_gen#set_phi y in
@@ -208,9 +208,15 @@ let rec eval_toplevel_definition = function
 
 
   | RecDefinitions (var, term) ->
-      print_endline "RecDef";
-      [(var, eval term)]
-
+      let context = subst_gen#phi in
+      (* rec binding *)
+      let () = ignore(subst_term (var |-> (term)) term) in
+      let evalterm = eval term in
+      let () = subst_gen#set_phi context in
+      let x = var |-> evalterm in
+      let y = union subst_gen#phi x in
+      let () = subst_gen#set_phi y in
+        [(var, evalterm)]
 
 and eval_program = function 
   | EmptyProgram -> []
