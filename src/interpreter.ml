@@ -6,6 +6,20 @@ let var_of_binder = function
 
 exception Matching_Failed
 
+(*
+let rec term2string = function
+  | EVar (_, var) -> Syntax.Var.Atom.basename var
+  | ELambda (_, lambda) -> let (binder, t) = open_lambda_abs lambda in
+                           Syntax.Var.Atom.basename (var_of_binder binder) ^ " -> " ^ (term2string t)
+  | ELet(_, letabs) -> let (var, t1, t2) = open_let_abs letabs in
+                       "Let " ^ (Syntax.Var.Atom.basename var) ^ " = " ^ (term2string t1) ^ " in " ^ (term2string t2)
+  | EConstant (_, primitive) -> (match primitive with
+                                 | Int(i) -> "<" ^ (string_of_int i) ^ ">"
+                                 | String(s) -> "\"" ^ s ^ "\""
+                                )
+  | x -> "xxx"                              
+*)
+
 class subst_gen =
 object (self)
   inherit map
@@ -25,6 +39,16 @@ object (self)
       print_endline " >";*)
       EVar (pos, x)
 
+  (*method dump = 
+    let buffer = Buffer.create 100000 in
+    let pk buf key = Buffer.add_string buf (Var.Atom.basename key) in
+    let pa buf data = Buffer.add_string buf (term2string data) in
+    let () = (Var.AtomMap.print pk pa) buffer self#phi in
+    let s = Buffer.contents buffer in
+    print_endline "+----------------------+";
+    print_endline s;
+    print_endline "+----------------------+"
+  *)
 end
 
 let subst_id =
@@ -74,9 +98,9 @@ let rec fix x t1 =
 
 let rec eval = function
   | EVar (annotation, var) ->
-      print_string "Eval -> EVar [ ";
-        print_string (Syntax.Var.Atom.basename (var));
-        print_endline " ]";
+      (*print_string "Eval -> EVar [ ";
+      print_string (Syntax.Var.Atom.basename (var));
+      print_endline " ]";*)
       subst_gen#evar (annotation, var) (* A priori ca va chercher la variable comme il faut *)
 
   | EConstant (annotation, primitive) as x ->
@@ -84,35 +108,34 @@ let rec eval = function
       x
 
   | EApp (annotation, level, term1, term2) ->
-      let () = print_endline "Eval -> EApp" in 
+      (*let () = print_endline "Eval -> EApp" in *)
       let tfun = eval term1 in
       (
         match tfun with
           | ELambda(annotation, lambda_abs) ->
               let (bind, term) = open_lambda_abs lambda_abs in
               let var = var_of_binder bind in
-              print_string "EApp -> ELambda [";
+              (*print_string "EApp -> ELambda [";
               print_string (Syntax.Var.Atom.basename var);
-              print_endline "]";
+              print_endline "]";*)
+              let cont = subst_gen#phi in 
               let new_bind = (var_of_binder bind) |-> (eval term2) in
-              let substterm = subst_term new_bind term in
-                eval substterm
-          | EVar(a, var) as x -> 
-              print_string "EApp -> EVar [";
-              print_string (Syntax.Var.Atom.basename var);
-              print_endline "]";
-                  x
+              let substterm = subst_term (union subst_gen#phi new_bind) term in
+              let res = eval substterm in
+              let () = subst_gen#set_phi cont in
+              res
           | _ ->
-                  print_endline "EApp -> _";
+                  (*print_endline "EApp -> _";*)
                   EApp(annotation, level, tfun, eval term2)
       )
 
   | ELambda (annotation, lambda_abs) as x ->
-      let () = print_string "Eval -> ELambda [ " in
+      (*let () = print_string "Eval -> ELambda [ " in
         let (binder, term) = (open_lambda_abs lambda_abs) in
         let var = var_of_binder binder in
         let () = print_string (Syntax.Var.Atom.basename var) in
         let () = print_endline " ]" in
+      *)
       
       x (* Ne pas évaluer une fonction ... *)
 
@@ -166,9 +189,13 @@ let rec eval_toplevel_definition = function
         print_newline ();
       *)
       let evalterm = eval term in
+      (*print_string "binding [ ";
+      print_string (Syntax.Var.Atom.basename var);
+      print_endline " ]";*)
       let x = var |-> evalterm in
       let y = union subst_gen#phi x in
       let () = subst_gen#set_phi y in
+        (*subst_gen#dump;*)
         [(var, evalterm)]
 
   | TypeDefinition (var, param_list, type_def) ->
