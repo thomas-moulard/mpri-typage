@@ -1,55 +1,8 @@
 open Syntax
 
-
-(* -- debug functions -- *)
-let rec print_list f l = match l with
-  | [] -> ""
-  | e::l -> f e ^ "\n" ^ print_list f l
-
-let rec print_param_list l = print_endline (print_list Syntax.Var.Atom.basename l)
-
-let rec print_ty ty = match ty with
-  | TyArrow(annotation, ty1, ty2) -> print_ty ty1 ^ " -> " ^ print_ty ty2
-  | TyApp(annotation, var, tyl) -> (Syntax.Var.Atom.basename var) ^ "." ^ (print_list print_ty tyl)
-  | TyVar(annotation, var) -> "var " ^ (Syntax.Var.Atom.basename var)
-  | TyConstant(annotation, ty_constant) ->
-      match ty_constant with
-        | TyString -> "string"
-        | TyInt -> "int"
-
-let print_datatype x = match x with
-  | DataType(v, tyl) -> "DataType" ^ "\n" ^ (Syntax.Var.Atom.basename v) ^ print_list print_ty tyl
-
-let print_typedef td = match td with
-  | AlgebraicDataType(x) -> print_endline "AlgebraicDataType"; print_endline (print_list print_datatype x)
-
 let var_of_binder = function
   | AnnotatedBind (x, _) -> x
   | Bind x -> x
-
-let term2string = function
-  | EVar (_, var) -> Syntax.Var.Atom.basename var
-  | ELambda (_, lambda_abs) -> let (binder, _) = open_lambda_abs lambda_abs in
-                               Syntax.Var.Atom.basename (var_of_binder binder)
-  | ELet (_, let_abs) -> let (var, _, _) = open_let_abs let_abs in
-                         Syntax.Var.Atom.basename var
-  | EConstant (_, primitive) -> (match primitive with
-                                  | Int(i) -> "<" ^ (string_of_int i) ^ ">"
-                                  | String(s) -> "\"" ^ s ^ "\""
-                                )
-  | x -> " xxx "
-
-let dump_map map =
-  let buffer = Buffer.create 100000 in
-  let pk buf key = Buffer.add_string buf (Var.Atom.basename key) in
-  let pa buf data = Buffer.add_string buf (term2string data) in
-  let () = (Var.AtomMap.print pk pa) buffer map in
-  (*Buffer.output_buffer stdout buffer*)
-  let s = Buffer.contents buffer in
-  print_endline "+----------------------+";
-  print_endline s;
-  print_endline "+----------------------+"
-(* -- end here -- *)
 
 exception Matching_Failed
 
@@ -165,7 +118,6 @@ let rec eval = function
       let (v, t, t') = open_rec_abs rec_abs in
       let _ = ELambda (annotation, Syntax.create_lambda_abs (Bind(v), t)) in
         ELet (annotation, create_let_abs(v, t, t'))
-  (*ELet (annotation, create_let_abs(v, fix lambda t, t'))*)
 
   | EMatch (annotation, term, clause_list) ->
       print_endline "Eval -> EMatch";

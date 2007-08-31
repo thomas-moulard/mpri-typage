@@ -1,3 +1,8 @@
+2007-08-31  Thomas Moulard  <thomas.moulard@gmail.com>
+
+	Clean code.
+	* src/interpreter.ml: Here.
+
 2007-08-27  Thomas Moulard  <thomas.moulard@gmail.com>
 
 	Matching, let rec.
