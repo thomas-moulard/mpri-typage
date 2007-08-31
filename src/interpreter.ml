@@ -17,7 +17,7 @@ let rec term2string = function
                                  | Int(i) -> "<" ^ (string_of_int i) ^ ">"
                                  | String(s) -> "\"" ^ s ^ "\""
                                 )
-  | x -> "xxx"                              
+  | x -> "xxx"
 *)
 
 class subst_gen =
@@ -39,7 +39,7 @@ object (self)
       print_endline " >";*)
       EVar (pos, x)
 
-  (*method dump = 
+  (*method dump =
     let buffer = Buffer.create 100000 in
     let pk buf key = Buffer.add_string buf (Var.Atom.basename key) in
     let pa buf data = Buffer.add_string buf (term2string data) in
@@ -118,7 +118,7 @@ let rec eval = function
               (*print_string "EApp -> ELambda [";
               print_string (Syntax.Var.Atom.basename var);
               print_endline "]";*)
-              let cont = subst_gen#phi in 
+              let cont = subst_gen#phi in
               let new_bind = (var_of_binder bind) |-> (eval term2) in
               let substterm = subst_term (union subst_gen#phi new_bind) term in
               let res = eval substterm in
@@ -136,7 +136,7 @@ let rec eval = function
         let () = print_string (Syntax.Var.Atom.basename var) in
         let () = print_endline " ]" in
       *)
-      
+
       x (* Ne pas évaluer une fonction ... *)
 
   | ELet (annotation, let_abs)  -> (*let () = print_string "Eval -> ELet [ " in*)
@@ -148,7 +148,7 @@ let rec eval = function
 
   (* ... *)
   | ELetRec (annotation, rec_abs) ->
-      print_endline "Eval -> ELetRec";
+      (*print_endline "Eval -> ELetRec";*)
       let (v, t, t') = open_rec_abs rec_abs in
       let context = subst_gen#phi in
       let () = ignore(subst_term (v |-> (t)) t) in
@@ -157,9 +157,9 @@ let rec eval = function
       x
 
   | EMatch (annotation, term, clause_list) ->
-      print_endline "Eval -> EMatch";
+      (*print_endline "Eval -> EMatch";*)
       eval_match (eval term) clause_list
-  | EAnnot (annotation, term, ty) as x -> print_endline "Eval -> EAnnot"; x
+  | EAnnot (annotation, term, ty) as x -> (*print_endline "Eval -> EAnnot";*) x
 
 and eval_match v = function
   | [] -> failwith "Pattern matching has failed."
@@ -218,7 +218,7 @@ let rec eval_toplevel_definition = function
       let () = subst_gen#set_phi y in
         [(var, evalterm)]
 
-and eval_program = function 
+and eval_program = function
   | EmptyProgram -> []
   | NewDefinition (i, otlabs) ->
       let (tldef, program) = open_toplevel_abs otlabs in
